@@ -7,6 +7,12 @@
 
 int main()
 {
+	//to c# 0 £» to ts 1
+	int nFileType = 0;
+
+	cout << "please input file type (0 : c# , 1 ts):" << endl;
+	cin >> nFileType;
+
 	COneFile onefile;
 	onefile.ReadIt("GUIDs.txt");
 
@@ -35,7 +41,15 @@ int main()
 		}
 	}
 	
-	analysisItem.WriteItemToCSharp("..\\..\\..\\Scripts\\sound\\FmodData.cs");
+	if (1 == nFileType)
+	{
+		analysisItem.WriteItemToTypeScript("FmodData.ts");
+	}
+	else
+	{ 
+		analysisItem.WriteItemToCSharp("FmodData.cs");
+	}
+
 	system("pause");
     return 0;
 }

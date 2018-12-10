@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FileAnalysis.h"
 #include <algorithm>
+#include "string"
 
 CFileAnalysis::CFileAnalysis()
 {
@@ -282,4 +283,242 @@ bool CFileAnalysis::WriteItemToCSharp(string sPath)
 	mOutFileStream.close();
 	return true;
 }
+
+bool CFileAnalysis::WriteItemToTypeScript(string sPath)
+{
+
+	mOutFileStream.open(sPath, std::ios::out | std::ios::trunc);
+	if (!mOutFileStream.is_open())
+	{
+		cout << "error cs file open failed";
+		return false;
+	}
+
+	mOutFileStream << "/* file name:  FmodData.ts" << "\n";
+	mOutFileStream << "*   descript:  fmod common data file\n";
+	mOutFileStream << "*     author:  leiqk 314332613@qq.com\n";
+	mOutFileStream << "*       date:  \n";
+	mOutFileStream << "*      other:  auto generate by tools , do not modify\n";
+	mOutFileStream << "*/\n";
+	mOutFileStream << "\n";
+
+	//定义枚举
+	mOutFileStream << "export module FmodData\n";
+	mOutFileStream << "{\n";
+	mOutFileStream << "\texport enum EnumFmodEvent\n";
+	mOutFileStream << "\t{\n";
+
+	for (auto item : mMapGuidEvent)
+	{
+		string sItem = item.second;
+		sItem.replace(0, 7, "");
+		int nPos = sItem.find(" ");
+		while (nPos != -1)
+		{
+			sItem.replace(nPos, 1, "");
+			nPos = sItem.find(" ");
+		}
+		nPos = sItem.find("/");
+		while (nPos != -1)
+		{
+			sItem.replace(nPos, 1, "_");
+			nPos = sItem.find("/");
+		}
+		nPos = sItem.find("-");
+		while (nPos != -1)
+		{
+			sItem.replace(nPos, 1, "_");
+			nPos = sItem.find("-");
+		}
+		sItem.insert(0, "\t\tEvent_");
+		sItem.append(",\n");
+		mOutFileStream << sItem.c_str();
+	}
+	mOutFileStream << "\t\tEvent_Size_Max,\n";
+	mOutFileStream << "\t}\n";
+
+	mOutFileStream << "\texport enum EnumFmodBus\n";
+	mOutFileStream << "\t{\n";
+	for (auto item : mMapGuidBus)
+	{
+		string sItem = item.second;
+		sItem.replace(0, 5, "");
+		int nPos = sItem.find(" ");
+		while (nPos != -1)
+		{
+			sItem.replace(nPos, 1, "");
+			nPos = sItem.find(" ");
+		}
+		nPos = sItem.find("/");
+		while (nPos != -1)
+		{
+			sItem.replace(nPos, 1, "_");
+			nPos = sItem.find("/");
+		}
+		nPos = sItem.find("-");
+		while (nPos != -1)
+		{
+			sItem.replace(nPos, 1, "_");
+			nPos = sItem.find("-");
+		}
+		sItem.insert(0, "\t\tBus_");
+		sItem.append(",\n");
+		mOutFileStream << sItem.c_str();
+	}
+	mOutFileStream << "\t\tBus_Size_Max,\n";
+	mOutFileStream << "\t}\n";
+
+	mOutFileStream << "\texport enum EnumFmodBank\n";
+	mOutFileStream << "\t{\n";
+	mOutFileStream << "\t\tBank_Master_Bank_Strings,\n";
+	for (auto item : mMapGuidBank)
+	{
+		string sItem = item.second;
+		sItem.replace(0, 6, "");
+		int nPos = sItem.find(" ");
+		while (nPos != -1)
+		{
+			sItem.replace(nPos, 1, "");
+			nPos = sItem.find(" ");
+		}
+		nPos = sItem.find("/");
+		while (nPos != -1)
+		{
+			sItem.replace(nPos, 1, "_");
+			nPos = sItem.find("/");
+		}
+		nPos = sItem.find("-");
+		while (nPos != -1)
+		{
+			sItem.replace(nPos, 1, "_");
+			nPos = sItem.find("-");
+		}
+		sItem.insert(0, "\t\tBank_");
+		sItem.append(",\n");
+		mOutFileStream << sItem.c_str();
+	}
+	mOutFileStream << "\t\tBank_Size_Max,\n";
+	mOutFileStream << "\t}\n";
+
+
+	//定义list
+	mOutFileStream << "\n";
+	//mOutFileStream << "\tclass FmodData\n";
+	//mOutFileStream << "\t{\n";
+	mOutFileStream << "\tvar _EventNames =\n";
+	mOutFileStream << "\t{\n";
+
+	int nIndex = 0;
+	for (auto item : mMapGuidEvent)
+	{
+		string sItem = item.second;
+		string strInsert = std::to_string(nIndex);
+		strInsert = "\t\t" + strInsert + " : \"";
+		sItem.insert(0, strInsert);
+		sItem.append("\",\n");		
+		mOutFileStream << sItem.c_str();
+		nIndex++;
+	}
+	mOutFileStream << "\t};\n";
+
+	mOutFileStream << "\tvar _BusNames =\n";
+	mOutFileStream << "\t{\n";
+	nIndex = 0;
+	for (auto item : mMapGuidBus)
+	{
+		string sItem = item.second;
+		string strInsert = std::to_string(nIndex);
+		strInsert = "\t\t" + strInsert + " : \"";
+		sItem.insert(0, strInsert);
+		sItem.append("\",\n");
+		mOutFileStream << sItem.c_str();
+		nIndex++;
+	}
+	mOutFileStream << "\t};\n";
+
+	mOutFileStream << "\tvar _BankNames =\n";
+	mOutFileStream << "\t{\n";
+
+	mOutFileStream << "\t\t0 : \"Master_Bank.strings\",\n";
+	nIndex = 1;
+	for (auto item : mMapGuidBank)
+	{
+		string sItem = item.second;
+		sItem.replace(0, 6, "");
+
+		string strInsert = std::to_string(nIndex);
+		strInsert = "\t\t" + strInsert + " : \"";
+		sItem.insert(0, strInsert);
+		sItem.append("\",\n");
+		mOutFileStream << sItem.c_str();
+		nIndex++;
+	}
+	mOutFileStream << "\t};\n";
+
+	/*
+	mOutFileStream << "\tvar _BankAssetBudleNames =\n";
+	mOutFileStream << "\t{\n";
+	mOutFileStream << "\t\t0 : \"sound/master_bank.strings\",\n";
+	nIndex = 1;
+	for (auto item : mMapGuidBank)
+	{
+		string sItem = item.second;
+		sItem.replace(0, 6, "");
+		sItem.insert(0, "sound/");
+		string strInsert = std::to_string(nIndex);
+		strInsert = "\t\t" + strInsert + " : \"";
+		sItem.insert(0, strInsert);
+		sItem.append("\",\n");
+		transform(sItem.begin(), sItem.end(), sItem.begin(), ::tolower);
+		mOutFileStream << sItem.c_str();
+		nIndex++;
+	}
+	mOutFileStream << "\t};\n";
+	*/
+	
+
+	mOutFileStream << "\texport function getEventName(eIndex : EnumFmodEvent) : string\n";
+	mOutFileStream << "\t{\n";
+	mOutFileStream << "\t\tif(eIndex < 0 || eIndex >= EnumFmodEvent.Event_Size_Max)\n";
+	mOutFileStream << "\t\t{\n";
+	mOutFileStream << "\t\t\tconsole.error(\"FmodData getEventName error index : \" + eIndex);\n";
+	mOutFileStream << "\t\t\treturn \"\";\n";
+	mOutFileStream << "\t\t}\n";
+	mOutFileStream << "\t\treturn this._EventNames[eIndex];\n";
+	mOutFileStream << "\t}\n";
+	mOutFileStream << "\texport function getBusName(eIndex : EnumFmodBus) : string\n";
+	mOutFileStream << "\t{\n";
+	mOutFileStream << "\t\tif(eIndex < 0 || eIndex >= EnumFmodBus.Bus_Size_Max)\n";
+	mOutFileStream << "\t\t{\n";
+	mOutFileStream << "\t\t\tconsole.error(\"FmodData getBusName error index : \" + eIndex);\n";
+	mOutFileStream << "\t\t\treturn \"\";\n";
+	mOutFileStream << "\t\t}\n";
+	mOutFileStream << "\t\treturn this._BusNames[eIndex];\n";
+	mOutFileStream << "\t}\n";
+	mOutFileStream << "\texport function getBankName(eIndex : EnumFmodBank) : string\n";
+	mOutFileStream << "\t{\n";
+	mOutFileStream << "\t\tif(eIndex < 0 || eIndex >= EnumFmodBank.Bank_Size_Max)\n";
+	mOutFileStream << "\t\t{\n";
+	mOutFileStream << "\t\t\tconsole.error(\"FmodData getBankName error index : \" + eIndex);\n";
+	mOutFileStream << "\t\t\treturn \"\";\n";
+	mOutFileStream << "\t\t}\n";
+	mOutFileStream << "\t\treturn this._BankNames[eIndex];\n";
+	mOutFileStream << "\t}\n";
+	//mOutFileStream << "\texport function getAssetBundleName(eIndex : EnumFmodBank) : string\n";
+	//mOutFileStream << "\t{\n";
+	//mOutFileStream << "\t\tif(eIndex < 0 || eIndex >= EnumFmodEvent.Event_Size_Max)\n";
+	//mOutFileStream << "\t\t{\n";
+	//mOutFileStream << "\t\t\tconsole.error(\"FmodData getAssetBundleName error index : \" + eIndex);\n";
+	//mOutFileStream << "\t\t\treturn \"\";\n";
+	//mOutFileStream << "\t\t}\n";
+	//mOutFileStream << "\t\treturn this._BankAssetBudleNames[eIndex];\n";
+	//mOutFileStream << "\t}\n";
+	mOutFileStream << "}\n";
+
+	mOutFileStream.close();
+	return true;
+}
+
+
+
 

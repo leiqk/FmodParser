@@ -18,6 +18,8 @@ public:
 	
 	bool WriteItemToCSharp(string sPath);
 
+	bool WriteItemToTypeScript(string sPath);
+
 	const map<string, string> &GetGuidEvent()const
 	{
 		return mMapGuidEvent;
