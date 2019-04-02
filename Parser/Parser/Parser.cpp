@@ -7,10 +7,10 @@
 
 int main()
 {
-	//to c# 0 £» to ts 1
+	//to c# 0 £» to ts 1  to c#tolua 2
 	int nFileType = 0;
 
-	cout << "please input file type (0 : c# , 1 ts):" << endl;
+	cout << "please input file type (0 : c# , 1 ts, 2 : c#tolua):" << endl;
 	cin >> nFileType;
 
 	COneFile onefile;
@@ -45,9 +45,13 @@ int main()
 	{
 		analysisItem.WriteItemToTypeScript("FmodData.ts");
 	}
-	else
-	{ 
+	else if (0 == nFileType)
+	{
 		analysisItem.WriteItemToCSharp("FmodData.cs");
+	}
+	else
+	{
+		analysisItem.WriteItemToCSharpToLua("FmodData.cs");
 	}
 
 	system("pause");
